@@ -23,8 +23,7 @@ import java.util.Map;
 
 import hudson.Extension;
 import hudson.model.User;
-import hudson.tasks.Mailer;
-import hudson.tasks.Mailer.UserProperty;
+import hudson.tasks.MailAddressResolver;
 
 /**
  * @author tgruetzm
@@ -35,14 +34,9 @@ public class MailToUserResolver extends User.CanonicalIdResolver {
   @Override
   public String resolveCanonicalId (String id,
                                     Map<String, ?> context) {
-
     for (User user: User.getAll ()) {
-      UserProperty mailerProperty = user.getProperty (Mailer.UserProperty.class);
-      if (mailerProperty == null) {
-        continue;
-      }
-      String addr = mailerProperty.getAddress ();
-      if (id.equalsIgnoreCase (addr)) {
+      // null check is explicit with equalsIgnoreCase
+      if (id.equalsIgnoreCase (MailAddressResolver.resolveFast (user))) {
         return user.getId ();
       }
     }
